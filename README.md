@@ -1,0 +1,54 @@
+# opslab-images
+
+Base images for the machines of [opslab](https://github.com/Sigeth/opslab-challenge-template) challenges (working name).
+
+## VM bases (`vm/`)
+
+KubeVirt containerDisks for `vm` machines, built from each distribution's official cloud image:
+
+| Base | Image | Source |
+|---|---|---|
+| `debian-13` | `ghcr.io/sigeth/opslab-images/debian-13:<version>` | Debian genericcloud |
+| `ubuntu-26.04` | `ghcr.io/sigeth/opslab-images/ubuntu-26.04:<version>` | Ubuntu server cloud image |
+| `rocky-10` | `ghcr.io/sigeth/opslab-images/rocky-10:<version>` | Rocky Linux GenericCloud (a RHEL rebuild: RHEL itself cannot be redistributed, but a subscriber can build a RHEL base with the same recipe format) |
+
+A base only adds what makes a good default: the QEMU guest agent, NoCloud as the only cloud-init datasource (no probing at boot), and no automatic updates. Users are **not** baked in: the platform creates `student` (UID 1000, passwordless `sudo`) and `opslab-checker` through cloud-init when an instance boots.
+
+### The base image contract
+
+The platform depends on this contract only, never on a distribution. Any image meeting it works as a `vm` machine image, so you can add your own base (another distribution, a licensed RHEL, an internal build):
+
+- a KubeVirt **containerDisk**: an OCI image for `linux/amd64` with one qcow2 disk under `/disk/`, owned by UID 107;
+- **cloud-init** with the **NoCloud** datasource;
+- **sshd** enabled on port 22, accepting public-key logins;
+- boots to SSH-ready **without network access**;
+- recommended: `qemu-guest-agent`.
+
+### Recipes
+
+Each base is a directory with an `image.yaml` recipe and its scripts:
+
+```yaml
+version: 1.0.0            # the tag the image is published under
+source:                   # exactly one of url (+ sha256 or sha512) and image
+  url: https://.../debian-13-genericcloud-amd64-20261026-2643.qcow2
+  sha512: 3ace18e3...
+  # image: ghcr.io/sigeth/opslab-images/debian-13@sha256:...   (build on a containerDisk)
+run: [customize.sh]       # run as root inside the disk, in order, with network access
+```
+
+The scripts run offline in the disk image with [`virt-customize`](https://libguestfs.org/virt-customize.1.html); the recipe directory is at `/tmp/recipe` meanwhile. The machine-id is reset so every instance gets its own. Challenges use the same format for their own VM images (`images/<machine>/image.yaml`, usually with `source.image` set to a base).
+
+Build one with [opslab-ci](https://github.com/Sigeth/opslab-ci) (Dagger):
+
+```sh
+dagger -m github.com/Sigeth/opslab-ci@v0.3.0 call vm-image --source=vm/debian-13 export --path=debian-13.tar
+```
+
+### Releases
+
+Tag `<base>/v<version>` (e.g. `debian-13/v1.0.0`) to publish a base; the version must match its `image.yaml`.
+
+## License
+
+MIT

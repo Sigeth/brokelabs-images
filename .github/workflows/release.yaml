@@ -1,0 +1,38 @@
+name: release
+
+# Publishes one base image per tag <base>/v<version>, e.g. debian-13/v1.0.0
+# -> ghcr.io/sigeth/opslab-images/debian-13:1.0.0. The version must match the
+# recipe's image.yaml.
+
+on:
+  push:
+    tags: ["*/v*"]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - id: tag
+        run: |
+          base="${GITHUB_REF_NAME%%/*}" version="${GITHUB_REF_NAME#*/v}"
+          recipe="vm/$base/image.yaml"
+          [ -f "$recipe" ] || { echo "no recipe $recipe"; exit 1; }
+          grep -qx "version: $version" "$recipe" || { echo "$recipe is not at version $version"; exit 1; }
+          echo "recipe=vm/$base" >> "$GITHUB_OUTPUT"
+          echo "address=ghcr.io/sigeth/opslab-images/$base:$version" >> "$GITHUB_OUTPUT"
+      - uses: dagger/dagger-for-github@v8.4.1
+        env:
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          version: "0.21.11"
+          module: github.com/Sigeth/opslab-ci@v0.3.0
+          verb: call
+          args: >-
+            vm-image --source=${{ steps.tag.outputs.recipe }}
+            with-registry-auth --address=ghcr.io --username=${{ github.actor }} --secret=env://REGISTRY_TOKEN
+            publish --address=${{ steps.tag.outputs.address }}

@@ -1,0 +1,8 @@
+# opslab base image: Debian 13 (trixie), from Debian's genericcloud image.
+# Built into a KubeVirt containerDisk by opslab-ci (`vm-image`), published as
+# ghcr.io/sigeth/opslab-images/debian-13:<version>.
+version: 1.0.0
+source:
+  url: https://cloud.debian.org/images/cloud/trixie/20261026-2643/debian-13-genericcloud-amd64-20261026-2643.qcow2
+  sha512: 3ace18e33bdd036edb49d1f79342bd01d2ab980e35194edb0b410435cd543538d286a0bd13bbb0835f7862306e3d385ce2f6a70d8ecf0bd961111166adbc1b8e
+run: [customize.sh]

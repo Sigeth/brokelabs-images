@@ -1,0 +1,8 @@
+# opslab base image: Ubuntu 26.04 LTS, from Ubuntu's server cloud image.
+# Built into a KubeVirt containerDisk by opslab-ci (`vm-image`), published as
+# ghcr.io/sigeth/opslab-images/ubuntu-26.04:<version>.
+version: 1.0.0
+source:
+  url: https://cloud-images.ubuntu.com/releases/resolute/release-20261016/ubuntu-26.04-server-cloudimg-amd64.img
+  sha256: 5645d0318ad21f643ebb1ac4567514620e9893380b07b0201fda163baa5b7eb5
+run: [customize.sh]

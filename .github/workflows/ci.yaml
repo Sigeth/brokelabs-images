@@ -1,0 +1,39 @@
+name: ci
+
+# Pipelines live in github.com/Sigeth/opslab-ci (Dagger). Every VM image
+# recipe (vm/<base>/image.yaml) is built on its own:
+#   dagger -m github.com/Sigeth/opslab-ci@v0.3.0 call vm-image --source=vm/debian-13
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  find:
+    runs-on: ubuntu-latest
+    outputs:
+      recipes: ${{ steps.find.outputs.recipes }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: find
+        run: echo "recipes=$(ls -d vm/*/image.yaml | xargs -n1 dirname | jq -R . | jq -cs .)" >> "$GITHUB_OUTPUT"
+
+  vm-image:
+    needs: find
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        recipe: ${{ fromJSON(needs.find.outputs.recipes) }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dagger/dagger-for-github@v8.4.1
+        with:
+          version: "0.21.11"
+          module: github.com/Sigeth/opslab-ci@v0.3.0
+          verb: call
+          args: vm-image --source=${{ matrix.recipe }}
