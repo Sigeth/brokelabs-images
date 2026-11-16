@@ -59,7 +59,7 @@ A base adds the `student` user and group (UID and GID 1000, no other groups, hom
 It keeps its package manager so challenges can install the tools their tasks need, and ships `drop-package-manager`, which removes it (and itself) as the last build step: nothing is installed at run time. The package database stays, so image scanners still see what is installed.
 
 ```dockerfile
-FROM ghcr.io/sigeth/opslab-images/alpine-3.24:1.0.0
+FROM ghcr.io/sigeth/opslab-images/alpine-3.24:1.0.0@sha256:b5813ffd71c722ba0cab3e5ad68b68668f2f4c137f617e01ad1ac91816a8399e
 USER root
 RUN apk add --no-cache bash && drop-package-manager
 USER 1000:1000
