@@ -45,9 +45,36 @@ Build one with [opslab-ci](https://github.com/Sigeth/opslab-ci) (Dagger):
 dagger -m github.com/Sigeth/opslab-ci@v0.3.0 call vm-image --source=vm/debian-13 export --path=debian-13.tar
 ```
 
-### Releases
+## Container bases (`container/`)
 
-Tag `<base>/v<version>` (e.g. `debian-13/v1.0.0`) to publish a base; the version must match its `image.yaml`.
+Starting points for the Dockerfiles of `pod` machines (`images/<machine>/Dockerfile` in a challenge):
+
+| Base | Image | Shell |
+|---|---|---|
+| `alpine-3.24` | `ghcr.io/sigeth/opslab-images/alpine-3.24:<version>` | busybox `sh` |
+| `debian-13-slim` | `ghcr.io/sigeth/opslab-images/debian-13-slim:<version>` | `bash` |
+
+A base adds the `student` user and group (UID and GID 1000, no other groups, home `/home/student`), `LANG=C.UTF-8`, a few login shell defaults, and nothing else: no `sudo`, editors or compilers. It runs as `1000:1000` in `/home/student`, like every pod machine.
+
+It keeps its package manager so challenges can install the tools their tasks need, and ships `drop-package-manager`, which removes it (and itself) as the last build step: nothing is installed at run time. The package database stays, so image scanners still see what is installed.
+
+```dockerfile
+FROM ghcr.io/sigeth/opslab-images/alpine-3.24:1.0.0
+USER root
+RUN apk add --no-cache bash && drop-package-manager
+USER 1000:1000
+```
+
+Build and test one with [opslab-ci](https://github.com/Sigeth/opslab-ci) (`container/test.sh` checks the user and `drop-package-manager`):
+
+```sh
+dagger -m github.com/Sigeth/opslab-ci@v0.3.0 call image --source=container/alpine-3.24 \
+  with-user --name=root with-file --path=/test.sh --source=container/test.sh with-exec --args=sh,/test.sh stdout
+```
+
+## Releases
+
+Tag `<base>/v<version>` (e.g. `debian-13/v1.0.0`) to publish a base; the version must match its `image.yaml` (VM bases) or the `org.opencontainers.image.version` label of its Dockerfile (container bases).
 
 ## License
 

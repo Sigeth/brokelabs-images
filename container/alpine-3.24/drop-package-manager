@@ -1,0 +1,6 @@
+#!/bin/sh
+# Removes the package manager (apk) and this script, as the last step of a
+# challenge image build: nothing is installed at run time. The package database
+# (/lib/apk/db) stays, so image scanners still see what is installed.
+set -eu
+rm -rf /sbin/apk /usr/lib/libapk.so* /etc/apk /var/cache/apk /usr/local/sbin/drop-package-manager

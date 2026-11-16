@@ -1,0 +1,9 @@
+#!/bin/sh
+# Removes the package manager (apt and dpkg) and this script, as the last step
+# of a challenge image build: nothing is installed at run time. The package
+# database (/var/lib/dpkg/status) stays, so image scanners still see what is
+# installed.
+set -eu
+rm -rf /usr/bin/apt /usr/bin/apt-* /usr/lib/apt /etc/apt /var/lib/apt /var/cache/apt \
+  /var/log/apt /usr/bin/dpkg /usr/bin/dpkg-* /var/cache/debconf/*-old \
+  /usr/local/sbin/drop-package-manager

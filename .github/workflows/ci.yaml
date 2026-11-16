@@ -1,8 +1,10 @@
 name: ci
 
 # Pipelines live in github.com/Sigeth/opslab-ci (Dagger). Every VM image
-# recipe (vm/<base>/image.yaml) is built on its own:
+# recipe (vm/<base>/image.yaml) and container base (container/<base>/Dockerfile)
+# is built on its own:
 #   dagger -m github.com/Sigeth/opslab-ci@v0.3.0 call vm-image --source=vm/debian-13
+#   dagger -m github.com/Sigeth/opslab-ci@v0.3.0 call image --source=container/alpine-3.24
 
 on:
   push:
@@ -17,10 +19,13 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       recipes: ${{ steps.find.outputs.recipes }}
+      containers: ${{ steps.find.outputs.containers }}
     steps:
       - uses: actions/checkout@v5
       - id: find
-        run: echo "recipes=$(ls -d vm/*/image.yaml | xargs -n1 dirname | jq -R . | jq -cs .)" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "recipes=$(ls -d vm/*/image.yaml | xargs -n1 dirname | jq -R . | jq -cs .)" >> "$GITHUB_OUTPUT"
+          echo "containers=$(ls -d container/*/Dockerfile | xargs -n1 dirname | jq -R . | jq -cs .)" >> "$GITHUB_OUTPUT"
 
   vm-image:
     needs: find
@@ -37,3 +42,25 @@ jobs:
           module: github.com/Sigeth/opslab-ci@v0.3.0
           verb: call
           args: vm-image --source=${{ matrix.recipe }}
+
+  # Container bases: built, then container/test.sh runs in the image as root.
+  container-image:
+    needs: find
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        base: ${{ fromJSON(needs.find.outputs.containers) }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dagger/dagger-for-github@v8.4.1
+        with:
+          version: "0.21.11"
+          module: github.com/Sigeth/opslab-ci@v0.3.0
+          verb: call
+          args: >-
+            image --source=${{ matrix.base }}
+            with-user --name=root
+            with-file --path=/test.sh --source=container/test.sh
+            with-exec --args=sh,/test.sh
+            stdout

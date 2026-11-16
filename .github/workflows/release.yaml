@@ -2,7 +2,8 @@ name: release
 
 # Publishes one base image per tag <base>/v<version>, e.g. debian-13/v1.0.0
 # -> ghcr.io/sigeth/opslab-images/debian-13:1.0.0. The version must match the
-# recipe's image.yaml.
+# recipe's image.yaml (VM bases, vm/<base>) or the Dockerfile's
+# org.opencontainers.image.version label (container bases, container/<base>).
 
 on:
   push:
@@ -20,10 +21,15 @@ jobs:
       - id: tag
         run: |
           base="${GITHUB_REF_NAME%%/*}" version="${GITHUB_REF_NAME#*/v}"
-          recipe="vm/$base/image.yaml"
-          [ -f "$recipe" ] || { echo "no recipe $recipe"; exit 1; }
-          grep -qx "version: $version" "$recipe" || { echo "$recipe is not at version $version"; exit 1; }
-          echo "recipe=vm/$base" >> "$GITHUB_OUTPUT"
+          if [ -f "vm/$base/image.yaml" ]; then
+            grep -qx "version: $version" "vm/$base/image.yaml" || { echo "vm/$base/image.yaml is not at version $version"; exit 1; }
+            echo "build=vm-image --source=vm/$base" >> "$GITHUB_OUTPUT"
+          elif [ -f "container/$base/Dockerfile" ]; then
+            grep -q "org.opencontainers.image.version=\"$version\"" "container/$base/Dockerfile" || { echo "container/$base/Dockerfile is not at version $version"; exit 1; }
+            echo "build=image --source=container/$base" >> "$GITHUB_OUTPUT"
+          else
+            echo "no base $base in vm/ or container/"; exit 1
+          fi
           echo "address=ghcr.io/sigeth/opslab-images/$base:$version" >> "$GITHUB_OUTPUT"
       - uses: dagger/dagger-for-github@v8.4.1
         env:
@@ -33,6 +39,6 @@ jobs:
           module: github.com/Sigeth/opslab-ci@v0.3.0
           verb: call
           args: >-
-            vm-image --source=${{ steps.tag.outputs.recipe }}
+            ${{ steps.tag.outputs.build }}
             with-registry-auth --address=ghcr.io --username=${{ github.actor }} --secret=env://REGISTRY_TOKEN
             publish --address=${{ steps.tag.outputs.address }}
