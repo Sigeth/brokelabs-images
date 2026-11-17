@@ -1,9 +1,9 @@
-# opslab container base: Debian 13 (trixie) slim with the student user (D28)
+# BrokeLabs container base: Debian 13 (trixie) slim with the student user (D28)
 # and nothing else (bash and coreutils come with Debian). Published as
-# ghcr.io/sigeth/opslab-images/debian-13-slim:<version>.
+# ghcr.io/sigeth/brokelabs-images/debian-13-slim:<version>.
 FROM docker.io/library/debian:13-slim@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2
-LABEL org.opencontainers.image.version="1.0.0" \
-      org.opencontainers.image.source="https://github.com/Sigeth/opslab-images" \
+LABEL org.opencontainers.image.version="1.0.1" \
+      org.opencontainers.image.source="https://github.com/Sigeth/brokelabs-images" \
       org.opencontainers.image.licenses="MIT"
 COPY --chmod=0755 drop-package-manager /usr/local/sbin/drop-package-manager
 # The home directory gets Debian's default .profile and .bashrc (/etc/skel).

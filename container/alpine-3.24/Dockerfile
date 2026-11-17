@@ -1,9 +1,9 @@
-# opslab container base: Alpine 3.24 with the student user (D28) and nothing
+# BrokeLabs container base: Alpine 3.24 with the student user (D28) and nothing
 # else (busybox provides the shell and the usual tools). Published as
-# ghcr.io/sigeth/opslab-images/alpine-3.24:<version>.
+# ghcr.io/sigeth/brokelabs-images/alpine-3.24:<version>.
 FROM docker.io/library/alpine:3.24@sha256:f59abe656b692d901e184be3445e084786602108599d2a51d229c0f5a48c71bf
-LABEL org.opencontainers.image.version="1.0.0" \
-      org.opencontainers.image.source="https://github.com/Sigeth/opslab-images" \
+LABEL org.opencontainers.image.version="1.0.1" \
+      org.opencontainers.image.source="https://github.com/Sigeth/brokelabs-images" \
       org.opencontainers.image.licenses="MIT"
 COPY --chmod=0755 drop-package-manager /usr/local/sbin/drop-package-manager
 COPY --chmod=0644 profile.sh /etc/profile.d/00-base.sh

@@ -1,7 +1,7 @@
 name: release
 
 # Publishes one base image per tag <base>/v<version>, e.g. debian-13/v1.0.0
-# -> ghcr.io/sigeth/opslab-images/debian-13:1.0.0. The version must match the
+# -> ghcr.io/sigeth/brokelabs-images/debian-13:1.0.0. The version must match the
 # recipe's image.yaml (VM bases, vm/<base>) or the Dockerfile's
 # org.opencontainers.image.version label (container bases, container/<base>).
 
@@ -30,13 +30,13 @@ jobs:
           else
             echo "no base $base in vm/ or container/"; exit 1
           fi
-          echo "address=ghcr.io/sigeth/opslab-images/$base:$version" >> "$GITHUB_OUTPUT"
+          echo "address=ghcr.io/sigeth/brokelabs-images/$base:$version" >> "$GITHUB_OUTPUT"
       - uses: dagger/dagger-for-github@v8.4.1
         env:
           REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           version: "0.21.11"
-          module: github.com/Sigeth/opslab-ci@v0.3.0
+          module: github.com/Sigeth/brokelabs-ci@v0.4.0
           verb: call
           args: >-
             ${{ steps.tag.outputs.build }}

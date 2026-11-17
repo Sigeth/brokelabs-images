@@ -1,10 +1,10 @@
 name: ci
 
-# Pipelines live in github.com/Sigeth/opslab-ci (Dagger). Every VM image
+# Pipelines live in github.com/Sigeth/brokelabs-ci (Dagger). Every VM image
 # recipe (vm/<base>/image.yaml) and container base (container/<base>/Dockerfile)
 # is built on its own:
-#   dagger -m github.com/Sigeth/opslab-ci@v0.3.0 call vm-image --source=vm/debian-13
-#   dagger -m github.com/Sigeth/opslab-ci@v0.3.0 call image --source=container/alpine-3.24
+#   dagger -m github.com/Sigeth/brokelabs-ci@v0.4.0 call vm-image --source=vm/debian-13
+#   dagger -m github.com/Sigeth/brokelabs-ci@v0.4.0 call image --source=container/alpine-3.24
 
 on:
   push:
@@ -39,7 +39,7 @@ jobs:
       - uses: dagger/dagger-for-github@v8.4.1
         with:
           version: "0.21.11"
-          module: github.com/Sigeth/opslab-ci@v0.3.0
+          module: github.com/Sigeth/brokelabs-ci@v0.4.0
           verb: call
           args: vm-image --source=${{ matrix.recipe }}
 
@@ -56,7 +56,7 @@ jobs:
       - uses: dagger/dagger-for-github@v8.4.1
         with:
           version: "0.21.11"
-          module: github.com/Sigeth/opslab-ci@v0.3.0
+          module: github.com/Sigeth/brokelabs-ci@v0.4.0
           verb: call
           args: >-
             image --source=${{ matrix.base }}

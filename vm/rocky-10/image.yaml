@@ -1,7 +1,7 @@
-# opslab base image: Rocky Linux 10 (a RHEL rebuild), from Rocky's
-# GenericCloud image. Built into a KubeVirt containerDisk by opslab-ci
-# (`vm-image`), published as ghcr.io/sigeth/opslab-images/rocky-10:<version>.
-version: 1.0.0
+# BrokeLabs base image: Rocky Linux 10 (a RHEL rebuild), from Rocky's
+# GenericCloud image. Built into a KubeVirt containerDisk by brokelabs-ci
+# (`vm-image`), published as ghcr.io/sigeth/brokelabs-images/rocky-10:<version>.
+version: 1.0.1
 source:
   url: https://dl.rockylinux.org/pub/rocky/10/images/x86_64/Rocky-10-GenericCloud-Base-10.2-20260525.0.x86_64.qcow2
   sha256: 9fc9e9ff16888bb68ac39b0392e25c9c92684d50c85f1cce6ab549363bbc4b48
