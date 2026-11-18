@@ -12,6 +12,8 @@ KubeVirt containerDisks for `vm` machines, built from each distribution's offici
 | `ubuntu-26.04` | `ghcr.io/sigeth/brokelabs-images/ubuntu-26.04:<version>` | Ubuntu server cloud image |
 | `rocky-10` | `ghcr.io/sigeth/brokelabs-images/rocky-10:<version>` | Rocky Linux GenericCloud (a RHEL rebuild: RHEL itself cannot be redistributed, but a subscriber can build a RHEL base with the same recipe format) |
 
+`kubeadm-1.36` (`ghcr.io/sigeth/brokelabs-images/kubeadm-1.36:<version>`) is a Kubernetes node built on `debian-13`: containerd, kubeadm, kubelet and kubectl 1.36 (held), flannel's manifest in `/etc/brokelabs/kube-flannel.yml`, and every image a kubeadm cluster with flannel needs, preloaded for offline instances: `brokelabs-k8s-images.service` imports them at boot, and setup scripts run `systemctl start brokelabs-k8s-images` before `kubeadm init` or `join`. Its disk is 10G.
+
 A base only adds what makes a good default: the QEMU guest agent, NoCloud as the only cloud-init datasource (no probing at boot), and no automatic updates. Users are **not** baked in: the platform creates `student` (UID 1000, passwordless `sudo`) and `brokelabs-checker` through cloud-init when an instance boots.
 
 ### The base image contract
@@ -34,6 +36,7 @@ source:                   # exactly one of url (+ sha256 or sha512) and image
   url: https://.../debian-13-genericcloud-amd64-20261026-2643.qcow2
   sha512: 3ace18e3...
   # image: ghcr.io/sigeth/brokelabs-images/debian-13@sha256:...   (build on a containerDisk)
+size: 10G                 # optional: the disk grows to it (the root filesystem at first boot)
 run: [customize.sh]       # run as root inside the disk, in order, with network access
 ```
 

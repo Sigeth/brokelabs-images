@@ -1,0 +1,11 @@
+# BrokeLabs Kubernetes node image: the Debian 13 base with containerd and
+# kubeadm, kubelet and kubectl 1.36, and every image a kubeadm cluster with
+# flannel needs, preloaded (instances have no Internet access). Published as
+# ghcr.io/sigeth/brokelabs-images/kubeadm-1.36:<version>.
+version: 1.0.0
+source:
+  image: ghcr.io/sigeth/brokelabs-images/debian-13:1.0.1@sha256:d3f504feb64f7f3cd947dedbb81e10ee1c3c4b5e89dce4fb7da9d280a6b361f2
+# Room for the preloaded images, containerd's unpacked copies and etcd (the
+# Debian cloud image has 3G); the root filesystem grows at first boot.
+size: 10G
+run: [customize.sh]
