@@ -53,6 +53,9 @@ Starting points for the Dockerfiles of `pod` machines (`images/<machine>/Dockerf
 |---|---|---|
 | `alpine-3.24` | `ghcr.io/sigeth/brokelabs-images/alpine-3.24:<version>` | busybox `sh` |
 | `debian-13-slim` | `ghcr.io/sigeth/brokelabs-images/debian-13-slim:<version>` | `bash` |
+| `workstation-k8s` | `ghcr.io/sigeth/brokelabs-images/workstation-k8s:<version>` | `bash` |
+
+`workstation-k8s` is the Alpine base with the tools of Kubernetes challenges: `kubectl` (Alpine's package, 1.36) with bash completion and the `k` alias, `helm`, `jq`, `yq`, `curl`, `openssl`, `vim`, `nano` and `less`. Use it for the machine that gets `kubeconfigFor` a `vcluster` machine: the platform mounts the kubeconfig and sets `KUBECONFIG`.
 
 A base adds the `student` user and group (UID and GID 1000, no other groups, home `/home/student`), `LANG=C.UTF-8`, a few login shell defaults, and nothing else: no `sudo`, editors or compilers. It runs as `1000:1000` in `/home/student`, like every pod machine.
 
