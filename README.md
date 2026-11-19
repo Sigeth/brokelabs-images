@@ -45,7 +45,7 @@ The scripts run offline in the disk image with [`virt-customize`](https://libgue
 Build one with [brokelabs-ci](https://github.com/Sigeth/brokelabs-ci) (Dagger):
 
 ```sh
-dagger -m github.com/Sigeth/brokelabs-ci@v0.4.0 call vm-image --source=vm/debian-13 export --path=debian-13.tar
+dagger -m github.com/Sigeth/brokelabs-ci@v0.5.0 call vm-image --source=vm/debian-13 export --path=debian-13.tar
 ```
 
 ## Container bases (`container/`)
@@ -74,7 +74,7 @@ USER 1000:1000
 Build and test one with [brokelabs-ci](https://github.com/Sigeth/brokelabs-ci) (`container/test.sh` checks the user and `drop-package-manager`):
 
 ```sh
-dagger -m github.com/Sigeth/brokelabs-ci@v0.4.0 call image --source=container/alpine-3.24 \
+dagger -m github.com/Sigeth/brokelabs-ci@v0.5.0 call image --source=container/alpine-3.24 \
   with-user --name=root with-file --path=/test.sh --source=container/test.sh with-exec --args=sh,/test.sh stdout
 ```
 
